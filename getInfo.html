@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Retrieve Extra Info</title>
+    <title>Retrieve Extra Info as JSON</title>
     
     <!-- Firebase CDN scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js"></script>
@@ -25,35 +25,35 @@
       firebase.initializeApp(firebaseConfig);
       const db = firebase.firestore();
 
-      // Function to retrieve and display stored info from Firestore
-      function retrieveExtraInfo() {
-        const output = document.getElementById("output");
-
+      // Function to output data as JSON
+      function outputAsJSON() {
         db.collection("urlData").orderBy("timestamp", "desc").get()
           .then((querySnapshot) => {
-            if (querySnapshot.empty) {
-              output.textContent = "No data found.";
-            } else {
-              querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                const p = document.createElement("p");
-                p.textContent = `Extra Text: ${data.extraText}, Timestamp: ${data.timestamp.toDate()}`;
-                output.appendChild(p);
+            const results = [];
+            querySnapshot.forEach((doc) => {
+              const data = doc.data();
+              results.push({
+                extraText: data.extraText,
+                timestamp: data.timestamp.toDate()
               });
-            }
+            });
+
+            // Output the data as JSON
+            const jsonOutput = JSON.stringify(results);
+            document.getElementById("output").textContent = jsonOutput;
           })
           .catch((error) => {
-            output.textContent = "Error retrieving data.";
+            document.getElementById("output").textContent = '{"error": "Error retrieving data"}';
             console.error("Error getting documents: ", error);
           });
       }
 
-      // Retrieve info on page load
-      window.onload = retrieveExtraInfo;
+      // Output JSON on page load
+      window.onload = outputAsJSON;
     </script>
 </head>
 <body>
-    <h1>Retrieved Extra Info from Firebase</h1>
-    <div id="output">Loading data...</div>
+    <!-- The JSON output will be written here -->
+    <div id="output"></div>
 </body>
 </html>
