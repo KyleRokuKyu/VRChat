@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retrieve Extra Info</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+    <script>
+      // Firebase configuration
+      const firebaseConfig = {
+		apiKey: "AIzaSyAYCkN3AyrxkC4fUcruNPQnnCDYk_J5bfs",
+		authDomain: "kylerokukyuvrc.firebaseapp.com",
+		projectId: "kylerokukyuvrc",
+		storageBucket: "kylerokukyuvrc.appspot.com",
+		messagingSenderId: "28800411911",
+		appId: "1:28800411911:web:168864df8dfe015766fda2"
+
+      };
+
+      // Initialize Firebase
+      const app = firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+
+      // Function to retrieve and display stored info from Firestore
+      function retrieveExtraInfo() {
+        const output = document.getElementById("output");
+
+        db.collection("urlData").orderBy("timestamp", "desc").get()
+          .then((querySnapshot) => {
+            if (querySnapshot.empty) {
+              output.textContent = "No data found.";
+            } else {
+              querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const p = document.createElement("p");
+                p.textContent = `Extra Text: ${data.extraText}, Timestamp: ${data.timestamp.toDate()}`;
+                output.appendChild(p);
+              });
+            }
+          })
+          .catch((error) => {
+            output.textContent = "Error retrieving data.";
+            console.error("Error getting documents: ", error);
+          });
+      }
+
+      // Retrieve info on page load
+      window.onload = retrieveExtraInfo;
+    </script>
+</head>
+<body>
+    <h1>Retrieved Extra Info from Firebase</h1>
+    <div id="output">Loading data...</div>
+</body>
+</html>
