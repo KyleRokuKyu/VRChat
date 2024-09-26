@@ -21,10 +21,15 @@
       const app = firebase.initializeApp(firebaseConfig);
       const db = firebase.firestore();
 
+      // Function to get query parameters
+      function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+      }
+
       // Function to store the extra string in Firestore
       function storeExtraInfo() {
-        // Get the extra string from the URL (anything after .html)
-        const extraText = window.location.pathname.split("/").pop().split(".html")[1] || "";
+        const extraText = getQueryParam("info");
 
         if (extraText) {
           db.collection("urlData").add({
