@@ -27,25 +27,34 @@
 
       // Function to output data as JSON
       function outputAsJSON() {
-        db.collection("urlData").orderBy("timestamp", "desc").get()
-          .then((querySnapshot) => {
-            const results = [];
-            querySnapshot.forEach((doc) => {
-              const data = doc.data();
-              results.push({
-                extraText: data.extraText,
-                timestamp: data.timestamp.toDate()
-              });
-            });
+        // Check if we want JSON response
+        const urlParams = new URLSearchParams(window.location.search);
+        const jsonRequest = urlParams.get("json");
 
-            // Output the data as JSON
-            const jsonOutput = JSON.stringify(results);
-            document.getElementById("output").textContent = jsonOutput;
-          })
-          .catch((error) => {
-            document.getElementById("output").textContent = '{"error": "Error retrieving data"}';
-            console.error("Error getting documents: ", error);
-          });
+        if (jsonRequest === "true") {
+          db.collection("urlData").orderBy("timestamp", "desc").get()
+            .then((querySnapshot) => {
+              const results = [];
+              querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                results.push({
+                  extraText: data.extraText,
+                  timestamp: data.timestamp.toDate()
+                });
+              });
+
+              // Output the data as JSON
+              const jsonOutput = JSON.stringify(results);
+              document.body.textContent = jsonOutput; // Directly output JSON to body
+            })
+            .catch((error) => {
+              document.body.textContent = '{"error": "Error retrieving data"}';
+              console.error("Error getting documents: ", error);
+            });
+        } else {
+          // Default HTML response if not a JSON request
+          document.body.innerHTML = "<h1>JSON API</h1><p>Use the '?json=true' query parameter to get JSON response.</p>";
+        }
       }
 
       // Output JSON on page load
@@ -53,7 +62,6 @@
     </script>
 </head>
 <body>
-    <!-- The JSON output will be written here -->
-    <div id="output"></div>
+    <!-- The JSON output will be written here or a message will be shown -->
 </body>
 </html>
